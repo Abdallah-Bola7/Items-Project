@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #1e1e2f 10%, #3a3a5f 90%);
+}
+
+.container {
+    max-width: 500px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    text-align: center;
+}
+
+.text {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* Form Inputs */
+form {
+    width: 100%;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.input-data {
+    position: relative;
+    width: 48%;
+}
+
+.input-data input {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 2px solid #aaa;
+    border-radius: 6px;
+    color: white;
+    font-size: 16px;
+}
+
+.input-data label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #ddd;
+    font-size: 14px;
+    transition: 0.3s ease-in-out;
+}
+
+.input-data input:focus + label,
+.input-data input:not(:placeholder-shown) + label {
+    top: -12px;
+    left: 10px;
+    font-size: 12px;
+    color: #56d8e4;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 2px 5px;
+    border-radius: 4px;
+}
+
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 12px 20px;
+    font-weight: bold;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.3s ease-in-out;
+    width: 100%;
+}
+
+.submit-btn {
+    background: #2ecc71;
+    color: white;
+}
+
+.submit-btn:hover {
+    background: #27ae60;
+    transform: scale(1.05);
+}
+
+.back-btn {
+    background: #e74c3c;
+    color: white;
+    margin-top: 10px;
+}
+
+.back-btn:hover {
+    background: #c0392b;
+    transform: scale(1.05);
+}

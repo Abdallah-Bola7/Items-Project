@@ -64,39 +64,98 @@ public class ItemController extends HttpServlet {
         doGet(request, response);
     }
 
-    private void addItem(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Item item = new Item(
+    private void addItem(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            ItemService itemService = new ItemServiceImpl(dataSource);
+            Item item = new Item(
                 request.getParameter("itemName"),
                 Double.parseDouble(request.getParameter("itemPrice")),
-                Integer.parseInt(request.getParameter("itemTotalNumber"))
-        );
+                Integer.parseInt(request.getParameter("itemTotalNumber")),
+                request.getParameter("description"),
+                java.sql.Date.valueOf(request.getParameter("issueDate")),
+                java.sql.Date.valueOf(request.getParameter("expiryDate"))
+            );
 
-        itemService.addItem(item);
-        response.sendRedirect("ItemController?action=loadItems"); 
+            boolean added = itemService.addItem(item);
+
+            if (added) {
+                response.sendRedirect("ItemController?action=loadItems"); 
+            } else {
+                response.getWriter().println("Error: Item could not be added.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void updateItem(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Item item = new Item(
+
+
+    private void updateItem(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            ItemService itemService = new ItemServiceImpl(dataSource);
+            Item item = new Item(
                 Integer.parseInt(request.getParameter("itemId")),
                 request.getParameter("itemName"),
                 Double.parseDouble(request.getParameter("itemPrice")),
-                Integer.parseInt(request.getParameter("itemTotalNumber"))
-        );
+                Integer.parseInt(request.getParameter("itemTotalNumber")),
+                request.getParameter("description"),
+                java.sql.Date.valueOf(request.getParameter("issueDate")),
+                java.sql.Date.valueOf(request.getParameter("expiryDate"))
+            );
 
-        itemService.updateItemById(item);
-        response.sendRedirect("ItemController?action=loadItems");
+            boolean updated = itemService.updateItemById(item);
+
+            if (updated) {
+                response.sendRedirect("ItemController?action=loadItems"); 
+            } else {
+                response.getWriter().println("Update failed. Please try again.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void deleteItem(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        itemService.removeItemById(Integer.parseInt(request.getParameter("itemId")));
-        response.sendRedirect("ItemController?action=loadItems");
+    private void deleteItem(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            ItemService itemService = new ItemServiceImpl(dataSource);
+            int itemId = Integer.parseInt(request.getParameter("itemId"));
+
+            boolean deleted = itemService.removeItemById(itemId);
+
+            if (deleted) {
+                response.sendRedirect("ItemController?action=loadItems"); 
+            } else {
+                response.getWriter().println("Error: Item could not be deleted.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    private void loadItem(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Item item = itemService.getItemById(Integer.parseInt(request.getParameter("itemId")));
-        request.setAttribute("itemSelected", item);
-        request.getRequestDispatcher("/update-item.jsp").forward(request, response);
+
+    private void loadItem(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            ItemService itemService = new ItemServiceImpl(dataSource);
+            int itemId = Integer.parseInt(request.getParameter("itemId"));
+
+            Item item = itemService.getItemById(itemId);
+
+            if (item == null) {
+                response.getWriter().println("Error: Item not found.");
+                return;
+            }
+
+            request.setAttribute("itemSelected", item);
+            request.getRequestDispatcher("/update-item.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 
     private void loadItems(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<Item> items = itemService.getAllItem();

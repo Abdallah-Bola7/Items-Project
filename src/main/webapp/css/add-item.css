@@ -177,3 +177,32 @@ a {
 .button:hover, a:hover {
     color: yellow;
 }
+.input-data {
+    position: relative;
+    width: 100%;
+}
+
+.input-data input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    background: transparent; /* Fix background issue on some browsers */
+}
+
+.input-data label {
+    position: absolute;
+    top: -20px; /* Moves the label above the input field */
+    left: 5px;
+    font-size: 14px;
+    color: #666;
+    transition: 0.3s;
+}
+
+.input-data input:focus + label,
+.input-data input:not(:placeholder-shown) + label {
+    top: -25px;
+    font-size: 12px;
+    color: #333;
+}
+

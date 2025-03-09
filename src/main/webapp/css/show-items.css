@@ -1,211 +1,140 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
 body {
-    background: #fafafa url(https://jackrugile.com/images/misc/noise-diagonal.png);
-    color: #444;
-    font: 100%/30px 'Helvetica Neue', helvetica, arial, sans-serif;
-    text-shadow: 0 1px 0 #fff;
-}
-
-strong {
-    font-weight: bold;
-}
-
-em {
-    font-style: italic;
-}
-
-table {
-    background: #f5f5f5;
-    border-collapse: separate;
-    box-shadow: inset 0 1px 0 #fff;
-    font-size: 12px;
-    line-height: 24px;
-    margin: 30px auto;
-    text-align: left;
-    width: 800px;
-}
-
-th {
-    background: url(https://jackrugile.com/images/misc/noise-diagonal.png), linear-gradient(#777, #444);
-    border-left: 1px solid #555;
-    border-right: 1px solid #777;
-    border-top: 1px solid #555;
-    border-bottom: 1px solid #333;
-    box-shadow: inset 0 1px 0 #999;
+    background: linear-gradient(135deg, #1e1e2f 10%, #3a3a5f 90%);
     color: #fff;
-    font-weight: bold;
-    padding: 10px 15px;
-    position: relative;
-    text-shadow: 0 1px 0 #000;
+    text-align: center;
+    padding: 20px;
 }
 
-th:after {
-    background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,.08));
-    content: '';
-    display: block;
-    height: 25%;
-    left: 0;
-    margin: 1px 0 0 0;
-    position: absolute;
-    top: 25%;
-    width: 100%;
-}
-
-th:first-child {
-    border-left: 1px solid #777;
-    box-shadow: inset 1px 1px 0 #999;
-}
-
-th:last-child {
-    box-shadow: inset -1px 1px 0 #999;
-}
-
-td {
-    border-right: 1px solid #fff;
-    border-left: 1px solid #e8e8e8;
-    border-top: 1px solid #fff;
-    border-bottom: 1px solid #e8e8e8;
-    padding: 10px 15px;
-    position: relative;
-    transition: all 300ms;
-}
-
-td:first-child {
-    box-shadow: inset 1px 0 0 #fff;
-}
-
-td:last-child {
-    border-right: 1px solid #e8e8e8;
-    box-shadow: inset -1px 0 0 #fff;
-}
-
-tr {
-    background: url(https://jackrugile.com/images/misc/noise-diagonal.png);
-}
-
-tr:nth-child(odd) td {
-    background: #f1f1f1 url(https://jackrugile.com/images/misc/noise-diagonal.png);
-}
-
-tr:last-of-type td {
-    box-shadow: inset 0 -1px 0 #fff;
-}
-
-tr:last-of-type td:first-child {
-    box-shadow: inset 1px -1px 0 #fff;
-}
-
-tr:last-of-type td:last-child {
-    box-shadow: inset -1px -1px 0 #fff;
-}
-
-tbody:hover td {
-    color: transparent;
-    text-shadow: 0 0 3px #aaa;
-}
-
-tbody:hover tr:hover td {
-    color: #444;
-    text-shadow: 0 1px 0 #fff;
-}
-
-a, button {
-    border: black;
-    background-color: brown;
-    color: white;
-    padding: 8px;
-    font-family: Arial;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-button:hover, a:hover {
-    color: yellow;
-    text-shadow: 0 1px 0 #fff;
+.layer {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
 }
 
 h1 {
-    margin: 0px 50% auto;
-    color: white;
-    padding-top: 50px;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
-
-body {
-    background-color: #444444;
-    background-image: url("istockphoto-1195769833-612x612.jpg");
-}
-
-.add {
-    background-color: rebeccapurple;
-    margin: 0% 24%;
-}
-.layer {
-    width: 101%;
-    min-height: 670px;
-    background-color: #333333;
-    opacity: 0.9;
-}
-a {
-    text-decoration: none;
-    color: white;
-}
-
-.button:hover, a:hover {
-    color: yellow;
-}
-
-.f {
-    margin-left: 24%;
-    width: 52%;
-    color: #9f01ea !important;
-}
-
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
+    padding: 15px;
     text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 th {
-    background-color: #f4f4f4;
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+tbody tr:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 tbody tr:hover {
-    background-color: #f1f1f1;
+    background: rgba(255, 255, 255, 0.2);
+    transition: 0.3s ease-in-out;
 }
 
-form {
-    display: inline-block;
-    margin: 0;
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
-form input[type="submit"] {
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-}
-
-form input[type="submit"]:hover {
-    background-color: darkred;
-}
-
-button.f {
-    margin-top: 20px;
-    padding: 10px 20px;
-    background-color: green;
-    border: none;
-}
-
-button.f a {
-    color: white;
+.action-buttons a {
     text-decoration: none;
+    font-weight: bold;
+    padding: 10px 16px;
+    border-radius: 30px;
+    transition: all 0.3s ease-in-out;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    border: none;
+    outline: none;
+}
+.action-buttons .update-btn {
+    background: #3498db;
+    color: white;
+    border: 2px solid #2980b9;
 }
 
+.action-buttons .update-btn:hover {
+    background: #2980b9;
+    transform: scale(1.1);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+.action-buttons .delete-btn {
+    background: #e74c3c;
+    color: white;
+    border: 2px solid #c0392b;
+}
+
+.action-buttons .delete-btn:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+.add-item-btn {
+    display: inline-flex;
+    padding: 12px 24px;
+    font-weight: bold;
+    background: #2ecc71;
+    color: white;
+    border-radius: 30px;
+    text-decoration: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+.add-item-btn:hover {
+    background: #27ae60;
+    transform: scale(1.1);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+    th, td {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .add-item-btn {
+        width: 90%;
+    }
+}

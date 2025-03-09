@@ -24,99 +24,136 @@ public class ItemServiceImpl implements  ItemService {
 	@Override
 	public List<Item> getAllItem() {
 	    List<Item> items = new ArrayList<>();
-	    String query = "SELECT * FROM Item";
+	    String query = "SELECT i.id, i.name, i.price, i.total_number, " +
+	               "d.description, d.issue_date, d.expiry_date " +  
+	               "FROM Item i " +
+	               "LEFT JOIN Item_details d ON i.id = d.id " +
+	               "ORDER BY i.id ASC";
 
-	    try (Connection connection = dataSource.getConnection();
-	         PreparedStatement stmt = connection.prepareStatement(query);
-	         ResultSet resultSet = stmt.executeQuery()) {
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(query);
+	         ResultSet rs = stmt.executeQuery()) {
 
-	        while (resultSet.next()) {
-	            items.add(new Item(
-	                    resultSet.getInt("ID"),
-	                    resultSet.getString("NAME"),
-	                    resultSet.getDouble("PRICE"),
-	                    resultSet.getInt("TOTAL_NUMBER")
-	            ));
+	        while (rs.next()) {
+	            Item item = new Item(
+	                rs.getInt("id"),
+	                rs.getString("name"),
+	                rs.getDouble("price"),
+	                rs.getInt("total_number"),
+	                rs.getString("description"),
+	                rs.getDate("issue_date"),
+	                rs.getDate("expiry_date")
+	            );
+	            items.add(item);
 	        }
-
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-
 	    return items;
 	}
 
 
+
+
 	@Override
 	public Item getItemById(int id) {
-	    String query = "SELECT * FROM Item WHERE ID = ?";
-	    
+	    String query = "SELECT i.ID, i.NAME, i.PRICE, i.TOTAL_NUMBER, d.DESCRIPTION, d.ISSUE_DATE, d.EXPIRY_DATE " +
+	                   "FROM Item i " +
+	                   "LEFT JOIN Item_details d ON i.ID = d.ID " +
+	                   "WHERE i.ID = ?";
+
 	    try (Connection connection = dataSource.getConnection();
 	         PreparedStatement stmt = connection.prepareStatement(query)) {
-	        
+
 	        stmt.setInt(1, id);
-	        try (ResultSet resultSet = stmt.executeQuery()) {
-	            if (resultSet.next()) {
-	                return new Item(
-	                        resultSet.getInt("ID"),
-	                        resultSet.getString("NAME"),
-	                        resultSet.getDouble("PRICE"),
-	                        resultSet.getInt("TOTAL_NUMBER")
-	                );
-	            }
+	        ResultSet resultSet = stmt.executeQuery();
+
+	        if (resultSet.next()) {
+	            return new Item(
+	                resultSet.getInt("ID"),
+	                resultSet.getString("NAME"),
+	                resultSet.getDouble("PRICE"),
+	                resultSet.getInt("TOTAL_NUMBER"),
+	                resultSet.getString("DESCRIPTION"),
+	                resultSet.getDate("ISSUE_DATE"),
+	                resultSet.getDate("EXPIRY_DATE")
+	            );
 	        }
 
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
 
-	    return null;
+	    return null; 
 	}
+
 
 
 	@Override
 	public boolean addItem(Item item) {
-	    String sql = "INSERT INTO Item (NAME, PRICE, TOTAL_NUMBER) VALUES (?, ?, ?)";
+	    String insertItemQuery = "INSERT INTO Item (ID, NAME, PRICE, TOTAL_NUMBER) VALUES (item_seq.NEXTVAL, ?, ?, ?)";
+	    String insertDetailsQuery = "INSERT INTO Item_details (ID, DESCRIPTION, ISSUE_DATE, EXPIRY_DATE) VALUES (?, ?, ?, ?)";
 
-	    try (Connection conn = dataSource.getConnection();
-	         PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+	    try (Connection connection = dataSource.getConnection();
+	         PreparedStatement itemStmt = connection.prepareStatement(insertItemQuery, new String[] {"ID"});
+	         PreparedStatement detailsStmt = connection.prepareStatement(insertDetailsQuery)) {
 
-	        stmt.setString(1, item.getName());
-	        stmt.setDouble(2, item.getPrice());
-	        stmt.setInt(3, item.getTotalNumber());
+	        connection.setAutoCommit(false); 
 
-	        int rowsInserted = stmt.executeUpdate();
+	        	        itemStmt.setString(1, item.getName());
+	        itemStmt.setDouble(2, item.getPrice());
+	        itemStmt.setInt(3, item.getTotalNumber());
+	        int rowsInserted = itemStmt.executeUpdate();
 
-	        if (rowsInserted > 0) {
-	            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-	                if (generatedKeys.next()) {
-	                    item.setId(generatedKeys.getInt(1)); 
-	                }
+	        
+	        int generatedId = -1;
+	        try (ResultSet generatedKeys = itemStmt.getGeneratedKeys()) {
+	            if (generatedKeys.next()) {
+	                generatedId = generatedKeys.getInt(1); 
+	                item.setId(generatedId);
 	            }
-	            return true;
 	        }
+
+	        	        detailsStmt.setInt(1, generatedId);
+	        detailsStmt.setString(2, item.getDescription());
+	        detailsStmt.setDate(3, new java.sql.Date(item.getIssueDate().getTime()));
+	        detailsStmt.setDate(4, new java.sql.Date(item.getExpiryDate().getTime()));
+	        detailsStmt.executeUpdate();
+
+	        connection.commit(); 
+	        return true;
 
 	    } catch (SQLException e) {
 	        e.printStackTrace();
+	        return false;
 	    }
-
-	    return false;
 	}
+
+
+
 	
 	@Override
 	public boolean updateItemById(Item item) {
-	    String query = "UPDATE Item SET NAME = ?, PRICE = ?, TOTAL_NUMBER = ? WHERE ID = ?";
+	    String updateItemQuery = "UPDATE Item SET NAME = ?, PRICE = ?, TOTAL_NUMBER = ? WHERE ID = ?";
+	    String updateDetailsQuery = "UPDATE Item_details SET description = ?, issue_date = ?, expiry_date = ? WHERE ID = ?";
 
 	    try (Connection connection = dataSource.getConnection();
-	         PreparedStatement stmt = connection.prepareStatement(query)) {
+	         PreparedStatement itemStmt = connection.prepareStatement(updateItemQuery);
+	         PreparedStatement detailsStmt = connection.prepareStatement(updateDetailsQuery)) {
 
-	        stmt.setString(1, item.getName());
-	        stmt.setDouble(2, item.getPrice());
-	        stmt.setInt(3, item.getTotalNumber());
-	        stmt.setInt(4, item.getId());
+	        itemStmt.setString(1, item.getName());
+	        itemStmt.setDouble(2, item.getPrice());
+	        itemStmt.setInt(3, item.getTotalNumber());
+	        itemStmt.setInt(4, item.getId());
+	        int itemUpdated = itemStmt.executeUpdate();
 
-	        int rowsUpdated = stmt.executeUpdate();
-	        return rowsUpdated > 0;
+	        detailsStmt.setString(1, item.getDescription());
+	        detailsStmt.setDate(2, new java.sql.Date(item.getIssueDate().getTime()));
+	        detailsStmt.setDate(3, new java.sql.Date(item.getExpiryDate().getTime()));
+	        detailsStmt.setInt(4, item.getId());
+	        int detailsUpdated = detailsStmt.executeUpdate();
+
+	        return itemUpdated > 0 && detailsUpdated > 0;
 
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -128,24 +165,15 @@ public class ItemServiceImpl implements  ItemService {
 
 	@Override
 	public boolean removeItemById(int id) {
-	    String deleteQuery = "DELETE FROM Item WHERE ID = ?";
-	    String resetSequenceQuery = "DECLARE v_max_id NUMBER; " +
-	                                "BEGIN " +
-	                                "SELECT COALESCE(MAX(ID), 0) INTO v_max_id FROM Item; " +
-	                                "EXECUTE IMMEDIATE 'ALTER SEQUENCE item_seq RESTART START WITH ' || (v_max_id + 1); " +
-	                                "END;";
+	    String query = "DELETE FROM Item WHERE ID = ?";
 
 	    try (Connection connection = dataSource.getConnection();
-	         PreparedStatement deleteStmt = connection.prepareStatement(deleteQuery);
-	         Statement resetStmt = connection.createStatement()) {
+	         PreparedStatement stmt = connection.prepareStatement(query)) {
 
-	        deleteStmt.setInt(1, id);
-	        int rowsDeleted = deleteStmt.executeUpdate();
+	        stmt.setInt(1, id);
+	        int rowsDeleted = stmt.executeUpdate();
 
-	        if (rowsDeleted > 0) {
-	            resetStmt.execute(resetSequenceQuery);
-	            return true;
-	        }
+	        return rowsDeleted > 0;
 
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -153,6 +181,7 @@ public class ItemServiceImpl implements  ItemService {
 
 	    return false;
 	}
+
 
 
 

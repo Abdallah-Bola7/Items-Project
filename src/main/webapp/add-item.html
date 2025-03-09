@@ -2,46 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ADD Item</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
-  <link rel="stylesheet" href="css/add-item.css">
+  <title>Add Item</title>
+  <link rel="stylesheet" href="css/form-style.css">
 </head>
 <body>
 
 <div class="container">
-  <div class="text">Add Item</div>
+  <div class="text">Add New Item</div>
   
   <form action="ItemController" method="post" autocomplete="off">
-    <!-- Hidden field to specify the action for the controller -->
     <input type="hidden" name="action" value="addItem">
     
     <div class="form-row">
       <div class="input-data">
         <input type="text" required name="itemName">
-        <div class="underline"></div>
         <label>Name</label>
       </div>
       <div class="input-data">
-        <input type="text" required name="itemPrice">
-        <div class="underline"></div>
+        <input type="number" required name="itemPrice" step="0.01">
         <label>Price</label>
       </div>
     </div>
     
     <div class="form-row">
       <div class="input-data">
-        <input type="text" required name="itemTotalNumber">
-        <div class="underline"></div>
+        <input type="number" required name="itemTotalNumber">
         <label>Total Number</label>
       </div>
     </div>
+
+    <div class="form-row">
+      <div class="input-data">
+        <input type="text" required name="description">
+        <label>Description</label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="input-data">
+        <input type="date" required name="issueDate" placeholder=" ">
+        <label>Issue Date</label>
+      </div>
+      <div class="input-data">
+        <input type="date" required name="expiryDate" placeholder=" ">
+        <label>Expiry Date</label>
+      </div>
+    </div>
     
-    <input type="submit" value="Add Item" class="button">
+    <button type="submit" class="btn submit-btn">Add Item</button>
   </form>
 
-  <p class="back">
-    <a href="ItemController?action=loadItems">Back To Items</a>
-  </p>
+  <a href="load-items.jsp" class="btn back-btn">Back to Items</a>
 </div>
 
 </body>
