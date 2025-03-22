@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -27,7 +28,9 @@ public class ItemController extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         itemService = new ItemServiceImpl(dataSource); 
+        getServletContext().setAttribute("itemService", itemService);
     }
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -53,6 +56,12 @@ public class ItemController extends HttpServlet {
             case "updateItem":
                 updateItem(request, response);
                 break;
+            case "addItemDetails":
+                addItemDetails(request, response);
+                break;
+            case "deleteItemDetails":
+                deleteItemDetails(request, response);
+                break;
             default:
                 loadItems(request, response);
         }
@@ -60,20 +69,18 @@ public class ItemController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
         doGet(request, response);
     }
 
     private void addItem(HttpServletRequest request, HttpServletResponse response) {
         try {
-            ItemService itemService = new ItemServiceImpl(dataSource);
             Item item = new Item(
                 request.getParameter("itemName"),
                 Double.parseDouble(request.getParameter("itemPrice")),
                 Integer.parseInt(request.getParameter("itemTotalNumber")),
                 request.getParameter("description"),
-                java.sql.Date.valueOf(request.getParameter("issueDate")),
-                java.sql.Date.valueOf(request.getParameter("expiryDate"))
+                Date.valueOf(request.getParameter("issueDate")),
+                Date.valueOf(request.getParameter("expiryDate"))
             );
 
             boolean added = itemService.addItem(item);
@@ -89,10 +96,10 @@ public class ItemController extends HttpServlet {
         }
     }
 
-
-
     private void updateItem(HttpServletRequest request, HttpServletResponse response) {
         try {
+            System.out.println("Updating item...");
+            
             ItemService itemService = new ItemServiceImpl(dataSource);
             Item item = new Item(
                 Integer.parseInt(request.getParameter("itemId")),
@@ -107,8 +114,10 @@ public class ItemController extends HttpServlet {
             boolean updated = itemService.updateItemById(item);
 
             if (updated) {
-                response.sendRedirect("ItemController?action=loadItems"); 
+                System.out.println("Item updated successfully!");
+                loadItems(request, response);
             } else {
+                System.out.println("Update failed!");
                 response.getWriter().println("Update failed. Please try again.");
             }
 
@@ -117,9 +126,9 @@ public class ItemController extends HttpServlet {
         }
     }
 
+
     private void deleteItem(HttpServletRequest request, HttpServletResponse response) {
         try {
-            ItemService itemService = new ItemServiceImpl(dataSource);
             int itemId = Integer.parseInt(request.getParameter("itemId"));
 
             boolean deleted = itemService.removeItemById(itemId);
@@ -135,10 +144,8 @@ public class ItemController extends HttpServlet {
         }
     }
 
-
     private void loadItem(HttpServletRequest request, HttpServletResponse response) {
         try {
-            ItemService itemService = new ItemServiceImpl(dataSource);
             int itemId = Integer.parseInt(request.getParameter("itemId"));
 
             Item item = itemService.getItemById(itemId);
@@ -156,10 +163,55 @@ public class ItemController extends HttpServlet {
         }
     }
 
-
     private void loadItems(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Item> items = itemService.getAllItem();
-        request.setAttribute("allItems", items);
+        List<Item> items = itemService.getAllItem(); 
+
+        if (items == null || items.isEmpty()) {
+            System.out.println("No items found!"); 
+        } else {
+            System.out.println("Loaded items count: " + items.size());
+        }
+
+        request.getSession().setAttribute("allItems", items);
         request.getRequestDispatcher("/load-items.jsp").forward(request, response);
+    }
+
+    private void addItemDetails(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            int itemId = Integer.parseInt(request.getParameter("itemId"));
+            String description = request.getParameter("description");
+            Date issueDate = java.sql.Date.valueOf(request.getParameter("issueDate"));
+            Date expiryDate = java.sql.Date.valueOf(request.getParameter("expiryDate"));
+
+            boolean success = itemService.addItemDetails(itemId, description, issueDate, expiryDate);
+
+            if (success) {
+                response.sendRedirect("ItemController?action=loadItems"); 
+            } else {
+                response.getWriter().println("❌ Error: Could not add item details.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    
+    private void deleteItemDetails(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            int itemId = Integer.parseInt(request.getParameter("itemId"));
+
+            boolean deleted = itemService.deleteItemDetails(itemId);
+
+            if (deleted) {
+                response.sendRedirect("ItemController?action=loadItems");
+            } else {
+                response.getWriter().println("Error: Details could not be deleted.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

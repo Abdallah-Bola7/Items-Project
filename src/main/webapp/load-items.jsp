@@ -1,7 +1,14 @@
 <%@page import="java.util.List"%>
 <%@page import="model.Item"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@page import="service.ItemService"%>
+<%@page import="service.impl.ItemServiceImpl"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<%
+    ItemService itemService = (ItemService) application.getAttribute("itemService");
+%>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,9 +36,10 @@
         </thead>
         <tbody>
             <%
-                List<Item> items = (List<Item>) request.getAttribute("allItems");
+                List<Item> items = (List<Item>) session.getAttribute("allItems");
                 if (items != null && !items.isEmpty()) {
                     for (Item item : items) {
+                        boolean hasDetails = itemService.hasDetails(item.getId());
             %>
             <tr>
                 <td><%= item.getId() %></td>
@@ -42,9 +50,19 @@
                 <td><%= item.getIssueDate() != null ? item.getIssueDate() : "N/A" %></td>
                 <td><%= item.getExpiryDate() != null ? item.getExpiryDate() : "N/A" %></td>
                 <td class="action-buttons">
-                    <a href="ItemController?action=loadItem&itemId=<%= item.getId() %>" class="update-btn"> Update</a>
+                    <a href="ItemController?action=loadItem&itemId=<%= item.getId() %>" class="update-btn">Update</a>
+
+                    <% if (!hasDetails) { %>
+   						 <a href="add-item-details.jsp?itemId=<%= item.getId() %>" class="add-btn">Add Details</a>
+					<% } %>
+
+	                <% if (hasDetails) { %>
+					    <a href="ItemController?action=deleteItemDetails&itemId=<%= item.getId() %>" class="delete-btn"
+					       onclick="return confirm('Are you sure you want to delete item details?');">Delete Details</a>
+					<% } %>	
+
                     <a href="ItemController?action=deleteItem&itemId=<%= item.getId() %>" class="delete-btn"
-                       onclick="return confirm('Are you sure you want to delete this item?');"> Delete</a>
+                       onclick="return confirm('Are you sure you want to delete this item?');">Delete</a>
                 </td>
             </tr>
             <%

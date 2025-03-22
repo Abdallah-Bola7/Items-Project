@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -24,16 +25,14 @@ public class ItemServiceImpl implements  ItemService {
 	@Override
 	public List<Item> getAllItem() {
 	    List<Item> items = new ArrayList<>();
-	    String query = "SELECT i.id, i.name, i.price, i.total_number, " +
-	               "d.description, d.issue_date, d.expiry_date " +  
-	               "FROM Item i " +
-	               "LEFT JOIN Item_details d ON i.id = d.id " +
-	               "ORDER BY i.id ASC";
+	    String sql = "SELECT i.id, i.name, i.price, i.total_number, d.description, d.issue_date, d.expiry_date " +
+	             "FROM item i LEFT JOIN item_details d ON i.id = d.id";
+
 
 	    try (Connection conn = dataSource.getConnection();
-	         PreparedStatement stmt = conn.prepareStatement(query);
+	         PreparedStatement stmt = conn.prepareStatement(sql);
 	         ResultSet rs = stmt.executeQuery()) {
-
+	    		
 	        while (rs.next()) {
 	            Item item = new Item(
 	                rs.getInt("id"),
@@ -46,14 +45,15 @@ public class ItemServiceImpl implements  ItemService {
 	            );
 	            items.add(item);
 	        }
+	        
+	        System.out.println("Fetched items: " + items.size());
+
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
+
 	    return items;
 	}
-
-
-
 
 	@Override
 	public Item getItemById(int id) {
@@ -86,8 +86,6 @@ public class ItemServiceImpl implements  ItemService {
 
 	    return null; 
 	}
-
-
 
 	@Override
 	public boolean addItem(Item item) {
@@ -127,6 +125,61 @@ public class ItemServiceImpl implements  ItemService {
 	        e.printStackTrace();
 	        return false;
 	    }
+	}
+
+	@Override
+	public boolean addItemDetails(int itemId, String description, Date issueDate, Date expiryDate) {
+	    String sql = "INSERT INTO item_details (id, description, issue_date, expiry_date) VALUES (?, ?, ?, ?)";
+
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+	        stmt.setInt(1, itemId);
+	        stmt.setString(2, description);
+	        stmt.setDate(3, new java.sql.Date(issueDate.getTime()));
+	        stmt.setDate(4, new java.sql.Date(expiryDate.getTime()));
+
+	        int rowsAffected = stmt.executeUpdate();
+	        return rowsAffected > 0;
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return false;  //
+	}
+
+
+
+	@Override
+	public boolean deleteItemDetails(int itemId) {
+	    String sql = "DELETE FROM Item_details WHERE id = ?";
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setInt(1, itemId);
+	        return ps.executeUpdate() > 0;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return false;
+	}
+
+	@Override
+	public boolean hasDetails(int itemId) {
+	    boolean exists = false;
+	    String sql = "SELECT COUNT(*) FROM Item_details WHERE id = ?";
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setInt(1, itemId);
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                exists = rs.getInt(1) > 0;
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return exists;
 	}
 
 
